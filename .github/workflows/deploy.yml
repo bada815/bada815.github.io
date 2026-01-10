@@ -2,7 +2,7 @@ name: Build Markdown to HTML
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 permissions:
   contents: read
