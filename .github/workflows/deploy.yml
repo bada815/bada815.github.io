@@ -1,39 +1,57 @@
-name: Build Markdown to HTML
+name: Deploy Notion Site to GitHub Pages
 
 on:
+  # 1. 코드가 main 브랜치에 푸시될 때 실행
   push:
-    branches: [ "main", "master" ]
+    branches: ["main"]
+  
+  # 2. 매일 자정에 자동 실행 (Notion 글 변경사항 반영)
+  schedule:
+    - cron: "0 0 * * *" 
+    
+  # 3. GitHub Actions 탭에서 수동 실행 가능
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
 
-      - name: Install pandoc
-        run: sudo apt-get install pandoc
+      - name: Setup Node.js ⚙️
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
 
-      - name: Convert md to html
-        run: |
-          mkdir dist
-          pandoc md/index.md -o dist/index.html
+      - name: Install Dependencies 📦
+        run: npm ci
 
-      - name: Upload artifact
+      - name: Build Static Site 🏗️
+        run: npm run build
+        env:
+          # Secrets에 등록한 Notion Page ID 주입
+          NOTION_PAGE_ID: ${{ secrets.NOTION_PAGE_ID }}
+
+      - name: Setup Pages 🔧
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact 
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          # Next.js의 output: 'export'는 기본적으로 'out' 폴더에 생성됨
+          path: ./out
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-
-    steps:
-      - uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages 🚀
+        id: deployment
+        uses: actions/deploy-pages@v4
