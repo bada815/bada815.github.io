@@ -3,7 +3,7 @@ name: Deploy Notion Site to GitHub Pages
 on:
   # 1. 코드가 main 브랜치에 푸시될 때 실행
   push:
-    branches: ["main"]
+    branches: ["master"]
   
   # 2. 매일 자정에 자동 실행 (Notion 글 변경사항 반영)
   schedule:
