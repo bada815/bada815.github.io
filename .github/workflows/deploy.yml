@@ -5,9 +5,9 @@ on:
   push:
     branches: ["master"]
   
-  # 2. 매일 자정에 자동 실행 (Notion 글 변경사항 반영)
+  # 2. 6시간 마다 자동 실행 (Notion 글 변경사항 반영)
   schedule:
-    - cron: "0 */6 * * *" 
+    - cron: "30 */6 * * *" 
     
   # 3. GitHub Actions 탭에서 수동 실행 가능
   workflow_dispatch:
